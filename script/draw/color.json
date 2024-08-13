@@ -1,0 +1,49 @@
+{
+    "main": {
+        "background": "#efebeb",
+        "centromere": "grey20",
+        "text": "grey20"
+    },
+    "copynumber": {
+      "high_cn_start":  "#f8b5b9",
+      "high_cn_end":  "#730511",
+      "low_cn_start":  "#9bd3b5",
+      "low_cn_end":  "#E4E6E1",
+      "cn_line": "black",
+      "cn_is_2_line":"#686789"
+    },
+    "shatterseek": {
+        "high_confidence":  "#ec864d",
+        "low_confidence":  "#e7c769"
+    },
+    "ctlpscanner": {
+        "start":  "#f7e3b9",
+        "end":  "#40b280"
+    },
+    "SA": {
+        "amplicon":  "#9d9d23"
+    },
+    "starfish": {
+        "CGR":  "#6abbc4"
+    },
+    "gGnome": {
+        "gGnome_colors": ["#8d88e1","#124076"]
+    },
+    "AA": {
+        "ecDNA":  "#124076",
+        "Linear":  "#7F9F80",
+        "BFB":  "#F9E897"
+    },
+    "sv": {
+      "deduplicated_region":  "#676662",
+      "line_del": "#98edf5",
+      "line_dup": "#f59898",
+      "line_inv": "#8df86e",
+      "line_tra": "#7D7465",
+      "nline_del": "#efebeb",
+      "nline_dup": "#efebeb",
+      "nline_inv": "#efebeb",
+      "nline_tra": "#efebeb"
+    }
+}
+  

@@ -59,7 +59,7 @@ fi
 cd ${WORK_DIR}/${id}/complex/AA
 
 python ${SCRIPT_DIR}/format_conv/cn2AAinput.py -input $cnv -output ${WORK_DIR}/${id}/complex/AA/cnvinput.bed || { echo "Error during AA"; exit 1; }
-AmpliconSuite-pipeline.py -s $prefix -t $threads --cnv_bed ${WORK_DIR}/${id}/complex/AA/cnvinput.bed \
+python /opt/conda/envs/main/bin/AmpliconSuite-pipeline.py -s $prefix -t $threads --cnv_bed ${WORK_DIR}/${id}/complex/AA/cnvinput.bed \
     --bam $tumor --ref $ref --normal_bam $normal --run_AA --run_AC || { echo "Error during AA"; exit 1; }
 
 

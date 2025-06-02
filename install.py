@@ -3,6 +3,9 @@ import os
 import tarfile
 import requests
 import zipfile
+
+baseurl = "http://life-bioinfo.tpddns.cn:13362"
+
 def validate_file(filepath):
     if not os.path.exists(filepath):
         raise argparse.ArgumentTypeError(f"The file '{filepath}' does not exist!")
@@ -11,6 +14,7 @@ def validate_file(filepath):
 
 
 def getarg():
+    global baseurl
     parser = argparse.ArgumentParser(description="Select the software to be installed, then generate a Dockerfile.")
     parser.add_argument('-sequenza', action='store_true', help="use sequenza for cellularity and ploidy")
     parser.add_argument("-manta", action='store_true', help="use manta for sv")
@@ -23,8 +27,11 @@ def getarg():
     parser.add_argument("-sclust", action='store_true', help="use sclust for cn")
     parser.add_argument("-cnvkit", action='store_true', help="use cnvkit for cn")
     parser.add_argument("-ref", type=str,choices=['hg19',"hg19&hg38"],default='hg19')
+    parser.add_argument("-baseurl", type=str,default=None)
     
     args = parser.parse_args()
+    if args.baseurl:
+        baseurl = args.baseurl
     tools = []
     sv_tools = ['manta', 'delly', 'svaba', 'gridss', 'lumpy', 'soreca']
     cn_tools = ['delly', 'purple', 'sclust', 'cnvkit','sequenza']
@@ -92,7 +99,7 @@ bioconda::bioconductor-genomeinfodbdata=1.2.9 bioconda::bioconductor-genomeinfod
         r-mass=7.3_60.0.1 r-gridextra=2.3 r-dplyr=1.1.4 r-factoextra=1.0.7 r-dendextend=1.17.1 r-gplots=3.1.3.1 r-ggpubr=0.6.0 \\
         r-reshape2=1.4.4 r-cowplot=1.1.3 r-patchwork=1.2.0 r-cairo=1.6_1 r-ggforce=0.4.2 r-testthat=3.2.1 \\
         conda-forge::r-markovchain=0.9.5 bioconda::bioconductor-copynumber=1.38.0  bioconda::bioconductor-rtracklayer=1.58.0 \\
-        bioconda::ampliconsuite mosek::mosek=10.1.28 bioconda::bioconductor-complexheatmap=2.14.0 conda-forge::r-complexupset conda-forge::r-circlize=0.4.16 -y && \\
+        bioconda::ampliconsuite mosek::mosek=10.1.28 bioconda::bioconductor-complexheatmap=2.14.0 conda-forge::r-circlize=0.4.16 conda-forge::r-complexupset r::r-ggplot2movies  -y && \\
     conda create -n py2 && . /opt/conda/etc/profile.d/conda.sh && \\
         conda activate py2 && mamba install python=2.7.15 \\
 """
@@ -194,12 +201,12 @@ def database(args):
         os.makedirs(gridss_database, exist_ok=True)
         if 'hg19' in args.ref:
             filename = "gridss_37.zip"
-            download_file("http://life-bioinfo.tpddns.cn:13362/download_file/gridss_37.zip", \
+            download_file(f"{baseurl}/download_file/gridss_37.zip", \
                 os.path.join(gridss_database,filename))
             unzip(os.path.join(gridss_database,filename), os.path.join(gridss_database,"37"))
         if 'hg38' in args.ref:
             filename = "gridss_38.zip"
-            download_file("http://life-bioinfo.tpddns.cn:13362/download_file/gridss_38.zip", \
+            download_file(f"{baseurl}/download_file/gridss_38.zip", \
                 os.path.join(gridss_database,filename))
             unzip(os.path.join(gridss_database,filename), os.path.join(gridss_database,"38"))
     if args.sclust or args.soreca:
@@ -207,26 +214,26 @@ def database(args):
         os.makedirs(annotation_database, exist_ok=True)
         if 'hg19' in args.ref:
             filename = "annotation.hg19.zip"
-            download_file("http://life-bioinfo.tpddns.cn:13362/download_file/annotation.hg19.zip", \
+            download_file(f"{baseurl}/download_file/annotation.hg19.zip", \
                 os.path.join(annotation_database,filename))
             unzip(os.path.join(annotation_database,filename), annotation_database)
         if 'hg38' in args.ref:
             filename = "annotation.hg38.zip"
-            download_file("http://life-bioinfo.tpddns.cn:13362/download_file/annotation.hg38.zip", \
+            download_file(f"{baseurl}/download_file/annotation.hg38.zip", \
                 os.path.join(annotation_database,filename))
             unzip(os.path.join(annotation_database,filename), annotation_database)
     if args.delly:
         delly_database=os.path.join("share","database","delly_map")
         os.makedirs(delly_database, exist_ok=True)
         filename = "delly_map.zip"
-        download_file("http://life-bioinfo.tpddns.cn:13362/download_file/delly_map.zip", \
+        download_file(f"{baseurl}/download_file/delly_map.zip", \
             os.path.join(delly_database,filename))
         unzip(os.path.join(delly_database,filename),delly_database)
     if args.svaba:
         dbsnp_database=os.path.join("share","database","dbsnp")
         os.makedirs(dbsnp_database, exist_ok=True)
         filename = "dbsnp.zip"
-        download_file("http://life-bioinfo.tpddns.cn:13362/download_file/dbsnp.zip", \
+        download_file(f"{baseurl}/download_file/dbsnp.zip", \
             os.path.join(dbsnp_database,filename))
         unzip(os.path.join(dbsnp_database,filename),dbsnp_database)
 

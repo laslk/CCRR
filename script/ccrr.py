@@ -78,7 +78,7 @@ def getarg():
     parser.add_argument("--genome-version", type=str, choices=["hg19", "hg38"],
                         help="Set the reference, hg19 or hg38")
     parser.add_argument("-reference", type=validate_file, help="reference fq")
-    parser.add_argument("-gender", type=str, help="male or female")
+    parser.add_argument("-gender",default='male', type=str, help="male or female")
 
 
     parser.add_argument("--sv-threshold", type=int, default=150,
@@ -370,7 +370,7 @@ def main():
             if cmd("cp " + os.path.join(workdir, "svaba", "svaba.svaba.somatic.sv.vcf") + " " + os.path.join(workdir, "svmerge")):
                 tools_cmd = tools_cmd + " -svaba " + os.path.join(workdir, "svmerge", "svaba.svaba.somatic.sv.vcf")
         if "gridss" in sv_tools:
-            if cmd("gzip -dk " + os.path.join(workdir, "gridss", "gripss_output", args.tumor_id + ".gripss.filtered.vcf")) and \
+            if cmd("gzip -dk " + os.path.join(workdir, "gridss", "gripss_output", args.tumor_id + ".gripss.filtered.vcf.gz")) and \
                     cmd("cp " + os.path.join(workdir, "gridss", "gripss_output", args.tumor_id + ".gripss.filtered.vcf") + " " + os.path.join(workdir, "svmerge")):
                 tools_cmd = tools_cmd + " -gridss " + os.path.join(workdir, "svmerge", args.tumor_id + ".gripss.filtered.vcf")
         if "lumpy" in sv_tools and cmd("cp " + os.path.join(workdir, "lumpy", "lumpy.gt.vcf") + " " + os.path.join(workdir, "svmerge")):
@@ -419,7 +419,7 @@ def main():
         if args.mode == "test":
             svpath = os.path.join(config.DATABASE_DIR,"data/test/custom_sv.bed")
             cnpath = os.path.join(config.DATABASE_DIR,"data/test/custom_cn.bed")
-
+ 
         if cmd("conda run --no-capture-out -n main python " + os.path.join(config.SCRIPT_DIR,"complex.py") +" -prefix " + str(args.prefix) + " --tumor-id " + args.tumor_id + " -sv " + svpath
                + " -cn " + cnpath + " --genome-version " + args.genome_version + " -tumor " +args.tumor +" -normal "+args.normal + " -reference " + args.reference + " -gender " + args.gender +
                " -shatterseek -starfish -gGnome -SA -AA -ctlpscanner -threads " + str(args.threads) + " -g " + str(args.g)+ " -purity " + str(cellularity)+ " -ploidy " + str(ploidy)):

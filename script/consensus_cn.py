@@ -127,19 +127,25 @@ def get_sequenza(path):
 
 
 
-
+def safe_round(val, default=2):
+    try:
+        return round(float(val))
+    except (ValueError, TypeError):
+        return default
 
 def cn_smooth(bp_dict, cn_dict):
     for method, chrom_bps in bp_dict.items():
         for chrom, bps in chrom_bps.items():
-            cn_values = [round(float(cn_dict[method][chrom][str(bp)])) for bp in bps[:-1]]
-            smoothed_bps = [bps[0]] + [bps[i] for i in range(1, len(cn_values)) if cn_values[i] != cn_values[i - 1]] + [
-                bps[-1]]
-            smoothed_cn = {bp: round(float(cn_dict[method][chrom][str(bp)])) for bp in smoothed_bps[:-1]}
+            cn_values = [safe_round(cn_dict[method][chrom][str(bp)]) for bp in bps[:-1]]
+            smoothed_bps = [bps[0]] + \
+                           [bps[i] for i in range(1, len(cn_values)) if cn_values[i] != cn_values[i-1]] + \
+                           [bps[-1]]
+            smoothed_cn = {bp: safe_round(cn_dict[method][chrom][str(bp)])
+                           for bp in smoothed_bps[:-1]}
             bp_dict[method][chrom] = smoothed_bps
             cn_dict[method][chrom] = smoothed_cn
-
     return bp_dict, cn_dict
+
 
 
 def get_breakpoint_regions(bp_dict, t, limit):
@@ -253,6 +259,12 @@ def get_different_cns(region, methods_cns):
         methods_regions[method] = split_regions
     return methods_regions
 
+def scale_using_log(value, scale_factor=100):
+    if value < 0:
+        return -log(1 - value * scale_factor)
+    else:
+        return log(1 + value * scale_factor)
+
 
 def get_consensus_cn(chrom, chrom_consensus_bps, cn_dict):
     method_cns = {}
@@ -289,14 +301,14 @@ def get_consensus_cn(chrom, chrom_consensus_bps, cn_dict):
             for k, v in different_cns.items():
                 tool_bias = Decimal(0)
                 tool_volatility  = Decimal(0)
-                for sub_dict in v:
+                for sub_dict in v:                
                     for tuple_key, value in sub_dict.items():
                         interval_length = tuple_key[1] - tuple_key[0] + 1
                         percent = Decimal(interval_length) / Decimal(total_length)
-                        tool_volatility=abs(Decimal(value) - Decimal(consensus_cn) / (Decimal(log(consensus_cn + 2)) + Decimal(1)) * Decimal(percent))
-                        tool_bias += (Decimal(value) - Decimal(consensus_cn) / (Decimal(log(consensus_cn + 2)) + Decimal(1)) * Decimal(percent))
-                bias[k] = float(tool_bias*1000) 
-                volatility[k] =  float(tool_volatility*1000)
+                        tool_volatility += abs(Decimal(value) - Decimal(consensus_cn)) / (Decimal(log(consensus_cn + 2)) + Decimal(1)) * Decimal(percent)
+                        tool_bias += (Decimal(value) - Decimal(consensus_cn)) / (Decimal(log(consensus_cn + 2)) + Decimal(1)) * Decimal(percent)
+                bias[k] =  scale_using_log(float(tool_bias))
+                volatility[k] =  scale_using_log(float(tool_volatility))
             consensus_cns[(start, end)] = (round(consensus_cn),consensus_cn,json.dumps(bias),json.dumps(volatility))
     return consensus_cns
 

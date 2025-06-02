@@ -148,7 +148,7 @@ def main():
         if not os.path.exists(starfish_file):
             copy_file(os.path.join(complex_blank_path, "starfish", "tumor_connected_CGR_event.csv"), starfish_file)
 
-        if args.genome_version == 'hg19' and args.gender == 'male' and cmd(
+        if args.genome_version == 'hg19' and cmd(
                 "conda run --no-capture-output -n main Rscript "+ os.path.join(config.SCRIPT_DIR,"draw","ccrr_draw.R")+" --ref "+ os.path.join(config.SCRIPT_DIR,"draw/hg19_man.txt")+" --cn "
                 + args.cn + " --shatterseek " + os.path.join(complex_path, "shatterseek", "chromothripsis_summary.csv")
                 + " --region " + os.path.join(config.SCRIPT_DIR,"draw/region/hg19_man.region")
@@ -161,21 +161,7 @@ def main():
             history.append('draw')
             update_history(history_file, 'draw')
 
-        if args.genome_version == 'hg19' and args.gender == 'female' and cmd(
-                "conda run --no-capture-output -n main Rscript "+ os.path.join(config.SCRIPT_DIR,"draw","ccrr_draw.R")+" --ref "+ os.path.join(config.SCRIPT_DIR,"draw/hg19_wm.txt")+" --cn "
-                + args.cn + " --shatterseek " + os.path.join(complex_path, "shatterseek", "chromothripsis_summary.csv")
-                + " --region " + os.path.join(config.SCRIPT_DIR,"draw/region/hg19_wm.region")
-                + " --ctlpscanner " + os.path.join(complex_path, "ctlpscanner", "CTLPRegion.txt")
-                + " --sa " + os.path.join(complex_path, "SA", "SA_amplicons.csv")
-                + " --aa " + os.path.join(complex_path, "AA", args.tumor_id + "_classification",args.tumor_id + "_result_data.json")
-                + " --gGnome " + os.path.join(complex_path, "gGnome", "event_footprints.txt")
-                + " --starfish " + os.path.join(complex_path, "starfish", args.tumor_id + "_connected_CGR_event.csv")
-                + " --sv " + args.sv + " --out " + os.path.join(complex_path, "summary.png")):
-            
-            history.append('draw')
-            update_history(history_file, 'draw')
-
-        if args.genome_version == 'hg38' and args.gender == 'male' and cmd(
+        if args.genome_version == 'hg38' and cmd(
                 "conda run --no-capture-output -n main Rscript "+ os.path.join(config.SCRIPT_DIR,"draw","ccrr_draw.R")+" --ref "+ os.path.join(config.SCRIPT_DIR,"draw/hg38_man.txt") + " --cn "
                 + args.cn + " --shatterseek " + os.path.join(complex_path, "shatterseek", "chromothripsis_summary.csv")
                 + " --region " + os.path.join(config.SCRIPT_DIR,"draw/region/hg38_man.region")
@@ -187,19 +173,23 @@ def main():
                 + " --sv " + args.sv + " --out " + os.path.join(complex_path, "summary.png")):
             history.append('draw')
             update_history(history_file, 'draw')
+    if 'json' not in history and cmd("conda run --no-capture-output -n main python "+ os.path.join(config.SCRIPT_DIR,"cr2json","cr2json.py") +  " --genome-version " +
+            args.genome_version + " --region "+ os.path.join(config.SCRIPT_DIR,"cr2json","region",args.genome_version + ".region ") +
+            " --centromere "+ os.path.join(config.SCRIPT_DIR,"cr2json","region",args.genome_version + "_centromere.region ") + " --cn "
+            + args.cn + " --shatterseek " +os.path.join(complex_path,"shatterseek","chromothripsis_summary.csv")
+            + " --ctlpscanner " +os.path.join(complex_path,"ctlpscanner","CTLPRegion.txt")
+            + " --sa "+os.path.join(complex_path,"SA","SA_amplicons.csv")
+            + " --aa " + os.path.join(complex_path, "AA", args.tumor_id + "_classification",args.tumor_id + "_result_data.json")
+            + " --gGnome "+os.path.join(complex_path,"gGnome","event_footprints.txt")
+            + " --starfish-events " + os.path.join(complex_path, "starfish", args.tumor_id + "_connected_CGR_event.csv")
+            + " --starfish-class " + os.path.join(complex_path,"starfish", args.tumor_id + "_pcawg_6signatures_class.csv")
+            + " --sv " + args.sv + " --out " + os.path.join(complex_path,"summary")
+            + " --annotations " + os.path.join(config.SCRIPT_DIR,"cr2json","region","ensembl_gene_data_" + args.genome_version + ".csv ")
+            + " --output " + os.path.join(complex_path,args.prefix+"circos.json")):
+            history.append('json')
+            update_history(history_file, 'json')
+        
 
-        if args.genome_version == 'hg38' and args.gender == 'female' and cmd(
-                "conda run --no-capture-output -n main Rscript "+ os.path.join(config.SCRIPT_DIR,"draw","ccrr_draw.R")+" --ref "+ os.path.join(config.SCRIPT_DIR,"draw/hg38_wm.txt")+" --cn "
-                + args.cn + " --shatterseek " + os.path.join(complex_path, "shatterseek", "chromothripsis_summary.csv")
-                + " --region " + os.path.join(config.SCRIPT_DIR,"draw/region/hg38_wm.region")
-                + " --ctlpscanner " + os.path.join(complex_path, "ctlpscanner", "CTLPRegion.txt")
-                + " --sa " + os.path.join(complex_path, "SA", "SA_amplicons.csv")
-                + " --aa " + os.path.join(complex_path, "AA", args.tumor_id + "_classification",args.tumor_id + "_result_data.json")
-                + " --gGnome " + os.path.join(complex_path, "gGnome", "event_footprints.txt")
-                + " --starfish " + os.path.join(complex_path, "starfish", args.tumor_id + "_connected_CGR_event.csv")
-                + " --sv " + args.sv + " --out " + os.path.join(complex_path, "summary.png")):
-            history.append('draw')
-            update_history(history_file, 'draw')
 
 
 if __name__ == "__main__":

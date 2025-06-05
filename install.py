@@ -4,7 +4,7 @@ import tarfile
 import requests
 import zipfile
 
-baseurl = "http://life-bioinfo.tpddns.cn:13362"
+baseurl = "http://life-bioinfo.cn:13362"
 
 def validate_file(filepath):
     if not os.path.exists(filepath):
